@@ -4,10 +4,14 @@ using UnityEngine;
 
 public class InputManager : MonoBehaviour {
 
-    public Camera cam;
     public List<Transform> prefabBuildings;
+    public Transform camFocus;
+    public float panSensitivity = 0.01f;
 
     private System.Random rand;
+    private Vector3 lastMousePosition;
+    private Vector3 lastFocusPosition;
+    private Camera cam;
 
     void Start()
     {
@@ -24,7 +28,6 @@ public class InputManager : MonoBehaviour {
             int layerMask = 1 << 8;
             if (Physics.Raycast(ray, out hit, Mathf.Infinity, layerMask))
             {
-                Debug.Log(hit.point);
                 //Debug.DrawLine(ray.origin, hit.point);
                 if (Mathf.Floor(hit.point.y) == 0)
                 {
@@ -32,10 +35,20 @@ public class InputManager : MonoBehaviour {
                 }
                 else
                 {
-                    
                     Instantiate(prefabBuildings[rand.Next(0, prefabBuildings.Count)], new Vector3(hit.transform.position.x, Mathf.Round(hit.point.y), hit.transform.position.z), Quaternion.identity);
                 }
             }
         }
+        if (Input.GetMouseButton(2))
+        {
+            Vector3 newRotation = new Vector3(cam.transform.eulerAngles.x, cam.transform.eulerAngles.y, cam.transform.eulerAngles.z);
+            Vector3 tmpRotation = camFocus.eulerAngles;
+            camFocus.eulerAngles = newRotation;
+            Vector3 delta = (Input.mousePosition - lastMousePosition);
+            camFocus.Translate(-delta.x * panSensitivity, 0, -delta.z * panSensitivity);
+            camFocus.eulerAngles = tmpRotation;
+        }
+        lastMousePosition = Input.mousePosition;
+        lastFocusPosition = camFocus.position;
     }
 }

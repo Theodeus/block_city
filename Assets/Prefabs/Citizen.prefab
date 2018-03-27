@@ -55,8 +55,8 @@ MeshRenderer:
   m_ReceiveShadows: 1
   m_DynamicOccludee: 1
   m_MotionVectors: 1
-  m_LightProbeUsage: 1
-  m_ReflectionProbeUsage: 1
+  m_LightProbeUsage: 0
+  m_ReflectionProbeUsage: 0
   m_Materials:
   - {fileID: 2100000, guid: c469a6f7dfe6c154ab2dea47e9ae7fae, type: 2}
   m_StaticBatchInfo:
@@ -99,6 +99,7 @@ MonoBehaviour:
   acceleration: 2
   deceleration: 60
   closeEnoughMeters: 4
+  startColor: {r: 1, g: 0.93103445, b: 0, a: 0}
 --- !u!136 &136666267908584500
 CapsuleCollider:
   m_ObjectHideFlags: 1

@@ -4,47 +4,58 @@ using System.Collections.Generic;
 
 public class PlayerController : MonoBehaviour {
 
-    private NavMeshAgent agent;
+    private NavMeshAgent _agent;
+    private Renderer _renderer;
+    private MaterialPropertyBlock _propBlock;
 
     public float acceleration = 2f;
     public float deceleration = 60f;
     public float closeEnoughMeters = 4f;
+    public Color startColor;
 
     private Dictionary<string, Color> buildings = new Dictionary<string, Color>();
 
     void Start()
     {
-        agent = gameObject.GetComponentInChildren<NavMeshAgent>();
+        _propBlock = new MaterialPropertyBlock();
+        _renderer = GetComponent<Renderer>();
+        _agent = gameObject.GetComponentInChildren<NavMeshAgent>();
         buildings.Add("Water", new Color(.4f, .7f, 1));
         buildings.Add("Food", new Color(1, .3f, .6f));
         buildings.Add("Housing", new Color(.5f, 1, .5f));
+
+        _renderer.GetPropertyBlock(_propBlock);
+        _propBlock.SetColor("_Color", startColor);
+        _renderer.SetPropertyBlock(_propBlock);
+
+        // set random destination
+        Vector3 destination = new Vector3(Random.Range(0, 100), 0, Random.Range(0, 100));
+        _agent.SetDestination(destination);
     }
 
     void Update()
     {
-        if (agent)
+        if (_agent)
         {
-            if (agent.hasPath)
-            {
-                // speed up slowly, but stop quickly
-                agent.acceleration = (agent.remainingDistance < closeEnoughMeters) ? deceleration : acceleration;
-            }
-            else
+            if (!_agent.hasPath)
             {
                 // set random destination
-                Vector3 destination = new Vector3(Random.Range(0, 10), 0, Random.Range(0, 10));
-                agent.SetDestination(destination);
+                Vector3 destination = new Vector3(Random.Range(0, 100), 0, Random.Range(0, 100));
+                _agent.SetDestination(destination);
+                // speed up slowly, but stop quickly
+                //agent.acceleration = (agent.remainingDistance < closeEnoughMeters) ? deceleration : acceleration;
             }
         }
     }
 
     private void OnTriggerEnter(Collider other)
     {
-        MeshRenderer mesh = gameObject.GetComponentInChildren<MeshRenderer>();
         Color newColor;
         if (buildings.TryGetValue(other.gameObject.tag, out newColor))
         {
-            mesh.material.color = newColor;
+            _renderer.GetPropertyBlock(_propBlock);
+            _propBlock.SetColor("_Color", newColor);
+            _renderer.SetPropertyBlock(_propBlock);
         }
     }
 }

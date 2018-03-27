@@ -119,8 +119,8 @@ public class SettingsCameraOrbitalThatFollows {
 	public float timeToReset = 8.0f;
 	//
 	[Space(10)]
-	[Range(-85,0)][Tooltip("In this variable it is possible to define the minimum angle that the camera can reach on the Y axis")]
-	public float minAngleY = 0.0f;
+	[Range(-85,10)][Tooltip("In this variable it is possible to define the minimum angle that the camera can reach on the Y axis")]
+	public float minAngleY = 10.0f;
 	[Range(0,85)][Tooltip("In this variable it is possible to define the maximum angle that the camera can reach on the Y axis")]
 	public float maxAngleY = 80.0f;
 	[Tooltip("If this variable is true, the camera ignores the colliders and crosses the walls freely.")]
@@ -322,191 +322,193 @@ public class MSCameraController : MonoBehaviour {
 		AudioListener.volume = cameras [index].volume;
 		timeScaleSpeed = Mathf.Clamp (1.0f / Time.timeScale, 0.01f, 1);
 		switch (cameras[index].rotationType ) {
-		case CameraType.TipoRotac.Stop:
-			//stop camera
-			break;
-		case CameraType.TipoRotac.StraightStop:
-			tempRotation = Quaternion.LookRotation(objPosicStopCameras[index].transform.position - cameras [index]._camera.transform.position, Vector3.up);
-			cameras [index]._camera.transform.rotation = Quaternion.Slerp(cameras [index]._camera.transform.rotation, tempRotation, Time.deltaTime * 15.0f);
-			break;
-		case CameraType.TipoRotac.LookAtThePlayer:
-			cameras [index]._camera.transform.LookAt (transform.position);
-			break;
-		case CameraType.TipoRotac.FirstPerson:
-			if (CameraSettings.firstPerson.rotateWhenClick) {
-				if (Input.GetKey (CameraSettings.firstPerson.keyToRotate)) {
-					rotacX += Input.GetAxis (CameraSettings.inputMouseX) * CameraSettings.firstPerson.sensibilityX;
-					rotacY += Input.GetAxis (CameraSettings.inputMouseY) * CameraSettings.firstPerson.sensibilityY;
-				}
-			} else {
-				rotacX += Input.GetAxis (CameraSettings.inputMouseX) * CameraSettings.firstPerson.sensibilityX;
-				rotacY += Input.GetAxis (CameraSettings.inputMouseY) * CameraSettings.firstPerson.sensibilityY;
-			}
-			rotacX = ClampAngle (rotacX, -CameraSettings.firstPerson.horizontalAngle, CameraSettings.firstPerson.horizontalAngle);
-			rotacY = ClampAngle (rotacY, -CameraSettings.firstPerson.verticalAngle, CameraSettings.firstPerson.verticalAngle);
-			temp_xQuaternion = Quaternion.AngleAxis (rotacX, Vector3.up);
-			temp_yQuaternion = Quaternion.AngleAxis (rotacY, -Vector3.right);
-			tempRotation = originalRotation [index] * temp_xQuaternion * temp_yQuaternion;
-			cameras [index]._camera.transform.localRotation = Quaternion.Lerp (cameras [index]._camera.transform.localRotation, tempRotation, Time.deltaTime * 10.0f * timeScaleSpeed);
-			//fieldOfView
-			cameras [index]._camera.fieldOfView -= Input.GetAxis (CameraSettings.inputMouseScrollWheel)*CameraSettings.firstPerson.speedScroolZoom*50.0f;
-			if (cameras [index]._camera.fieldOfView < (initialFieldOfView [index] - CameraSettings.firstPerson.maxScroolZoom)) {
-				cameras [index]._camera.fieldOfView = (initialFieldOfView [index] - CameraSettings.firstPerson.maxScroolZoom);
-			}
-			if (cameras [index]._camera.fieldOfView > initialFieldOfView [index]) {
-				cameras [index]._camera.fieldOfView = (initialFieldOfView [index]);
-			}
-			break;
-		case CameraType.TipoRotac.FollowPlayer:
-			if (!Physics.Linecast (transform.position, originalPosition [index].transform.position)) {
-				cameras [index]._camera.transform.position = Vector3.Lerp (cameras [index]._camera.transform.position, originalPosition [index].transform.position, Time.deltaTime * CameraSettings.followPlayer.displacementSpeed);
-			} else if (Physics.Linecast (transform.position, originalPosition [index].transform.position, out tempHit)) {
-				if (CameraSettings.followPlayer.ignoreCollision) {
-					cameras [index]._camera.transform.position = Vector3.Lerp (cameras [index]._camera.transform.position, originalPosition [index].transform.position, Time.deltaTime * CameraSettings.followPlayer.displacementSpeed);
-				} else {
-					cameras [index]._camera.transform.position = Vector3.Lerp (cameras [index]._camera.transform.position, tempHit.point, Time.deltaTime * CameraSettings.followPlayer.displacementSpeed);
-				}
-			}
-			//
-			if (CameraSettings.followPlayer.customLookAt) {
-				tempRotation = Quaternion.LookRotation (transform.position - cameras [index]._camera.transform.position, Vector3.up);
-				cameras [index]._camera.transform.rotation = Quaternion.Slerp (cameras [index]._camera.transform.rotation, tempRotation, Time.deltaTime * CameraSettings.followPlayer.spinSpeedCustomLookAt);
-			} else {
-				cameras [index]._camera.transform.LookAt (transform.position);
-			}
-			break;
-		case CameraType.TipoRotac.Orbital:
-			tempFloat = CameraSettings.orbital.minDistance;
-			if (!Physics.Linecast (transform.position, cameras [index]._camera.transform.position)) {
+		    case CameraType.TipoRotac.Stop:
+			    //stop camera
+			    break;
+		    case CameraType.TipoRotac.StraightStop:
+			    tempRotation = Quaternion.LookRotation(objPosicStopCameras[index].transform.position - cameras [index]._camera.transform.position, Vector3.up);
+			    cameras [index]._camera.transform.rotation = Quaternion.Slerp(cameras [index]._camera.transform.rotation, tempRotation, Time.deltaTime * 15.0f);
+			    break;
+		    case CameraType.TipoRotac.LookAtThePlayer:
+			    cameras [index]._camera.transform.LookAt (transform.position);
+			    break;
+		    case CameraType.TipoRotac.FirstPerson:
+			    if (CameraSettings.firstPerson.rotateWhenClick) {
+				    if (Input.GetKey (CameraSettings.firstPerson.keyToRotate)) {
+					    rotacX += Input.GetAxis (CameraSettings.inputMouseX) * CameraSettings.firstPerson.sensibilityX;
+					    rotacY += Input.GetAxis (CameraSettings.inputMouseY) * CameraSettings.firstPerson.sensibilityY;
+				    }
+			    } else {
+				    rotacX += Input.GetAxis (CameraSettings.inputMouseX) * CameraSettings.firstPerson.sensibilityX;
+				    rotacY += Input.GetAxis (CameraSettings.inputMouseY) * CameraSettings.firstPerson.sensibilityY;
+			    }
+			    rotacX = ClampAngle (rotacX, -CameraSettings.firstPerson.horizontalAngle, CameraSettings.firstPerson.horizontalAngle);
+			    rotacY = ClampAngle (rotacY, -CameraSettings.firstPerson.verticalAngle, CameraSettings.firstPerson.verticalAngle);
+			    temp_xQuaternion = Quaternion.AngleAxis (rotacX, Vector3.up);
+			    temp_yQuaternion = Quaternion.AngleAxis (rotacY, -Vector3.right);
+			    tempRotation = originalRotation [index] * temp_xQuaternion * temp_yQuaternion;
+			    cameras [index]._camera.transform.localRotation = Quaternion.Lerp (cameras [index]._camera.transform.localRotation, tempRotation, Time.deltaTime * 10.0f * timeScaleSpeed);
+			    //fieldOfView
+			    cameras [index]._camera.fieldOfView -= Input.GetAxis (CameraSettings.inputMouseScrollWheel)*CameraSettings.firstPerson.speedScroolZoom*50.0f;
+			    if (cameras [index]._camera.fieldOfView < (initialFieldOfView [index] - CameraSettings.firstPerson.maxScroolZoom)) {
+				    cameras [index]._camera.fieldOfView = (initialFieldOfView [index] - CameraSettings.firstPerson.maxScroolZoom);
+			    }
+			    if (cameras [index]._camera.fieldOfView > initialFieldOfView [index]) {
+				    cameras [index]._camera.fieldOfView = (initialFieldOfView [index]);
+			    }
+			    break;
+		    case CameraType.TipoRotac.FollowPlayer:
+			    if (!Physics.Linecast (transform.position, originalPosition [index].transform.position)) {
+				    cameras [index]._camera.transform.position = Vector3.Lerp (cameras [index]._camera.transform.position, originalPosition [index].transform.position, Time.deltaTime * CameraSettings.followPlayer.displacementSpeed);
+			    } else if (Physics.Linecast (transform.position, originalPosition [index].transform.position, out tempHit)) {
+				    if (CameraSettings.followPlayer.ignoreCollision) {
+					    cameras [index]._camera.transform.position = Vector3.Lerp (cameras [index]._camera.transform.position, originalPosition [index].transform.position, Time.deltaTime * CameraSettings.followPlayer.displacementSpeed);
+				    } else {
+					    cameras [index]._camera.transform.position = Vector3.Lerp (cameras [index]._camera.transform.position, tempHit.point, Time.deltaTime * CameraSettings.followPlayer.displacementSpeed);
+				    }
+			    }
+			    //
+			    if (CameraSettings.followPlayer.customLookAt) {
+				    tempRotation = Quaternion.LookRotation (transform.position - cameras [index]._camera.transform.position, Vector3.up);
+				    cameras [index]._camera.transform.rotation = Quaternion.Slerp (cameras [index]._camera.transform.rotation, tempRotation, Time.deltaTime * CameraSettings.followPlayer.spinSpeedCustomLookAt);
+			    } else {
+				    cameras [index]._camera.transform.LookAt (transform.position);
+			    }
+			    break;
+		    case CameraType.TipoRotac.Orbital:
+			    tempFloat = CameraSettings.orbital.minDistance;
+			    if (!Physics.Linecast (transform.position, cameras [index]._camera.transform.position)) {
 
-			} else if (Physics.Linecast (transform.position, cameras [index]._camera.transform.position, out tempHit)) {
-				if (!CameraSettings.orbital.ignoreCollision) {
-					distanceFromOrbitalCamera [index] = Vector3.Distance (transform.position, tempHit.point);
-					tempFloat = Mathf.Clamp ((Vector3.Distance (transform.position, tempHit.point)), tempFloat * 0.5f, CameraSettings.orbital.maxDistance);
-				}
-			}
-			if (CameraSettings.orbital.rotateWhenClick) {
-				if (Input.GetKey (CameraSettings.orbital.keyToRotate)) {
-					xOrbit [index] += Input.GetAxis (CameraSettings.inputMouseX) * (CameraSettings.orbital.sensibility * distanceFromOrbitalCamera [index]) / (distanceFromOrbitalCamera [index] * 0.5f);
-					yOrbit [index] -= Input.GetAxis (CameraSettings.inputMouseY) * CameraSettings.orbital.sensibility * (CameraSettings.orbital.speedYAxis * 10.0f);
-				}
-			} else {
-				xOrbit [index] += Input.GetAxis (CameraSettings.inputMouseX) * (CameraSettings.orbital.sensibility * distanceFromOrbitalCamera [index]) / (distanceFromOrbitalCamera [index] * 0.5f);
-				yOrbit [index] -= Input.GetAxis (CameraSettings.inputMouseY) * CameraSettings.orbital.sensibility * (CameraSettings.orbital.speedYAxis * 10.0f);
-			}
-			yOrbit [index] = ClampAngle (yOrbit [index], CameraSettings.orbital.minAngleY, CameraSettings.orbital.maxAngleY);
-			tempRotation2 = Quaternion.Euler (yOrbit [index], xOrbit [index], 0);
-			distanceFromOrbitalCamera [index] = Mathf.Clamp (distanceFromOrbitalCamera [index] - Input.GetAxis (CameraSettings.inputMouseScrollWheel) * (CameraSettings.orbital.speedScrool * 50.0f), tempFloat, CameraSettings.orbital.maxDistance);
-			negPosition = new Vector3 (0.0f, 0.0f, -distanceFromOrbitalCamera [index]);
-			otherPosition = tempRotation2 * negPosition + transform.position;
-			newPosition = cameras [index]._camera.transform.position;
-			tempRotation = cameras [index]._camera.transform.rotation;
-			cameras [index]._camera.transform.rotation = Quaternion.Lerp(tempRotation,tempRotation2,Time.deltaTime*5.0f*timeScaleSpeed);
-			cameras [index]._camera.transform.position = Vector3.Lerp(newPosition,otherPosition,Time.deltaTime*5.0f*timeScaleSpeed);
-			break;
-		case CameraType.TipoRotac.OrbitalThatFollows:
-			if (CameraSettings.OrbitalThatFollows.rotateWhenClick) {
-				if (Input.GetKey (CameraSettings.OrbitalThatFollows.keyToRotate)) {
-					movXTemp = Input.GetAxis (CameraSettings.inputMouseX);
-					movYTemp = Input.GetAxis (CameraSettings.inputMouseY);
-				}
-			} else {
-				movXTemp = Input.GetAxis (CameraSettings.inputMouseX);
-				movYTemp = Input.GetAxis (CameraSettings.inputMouseY);
-			}
-			movZTemp = Input.GetAxis (CameraSettings.inputMouseScrollWheel);
-			if (movXTemp > 0.0f || movYTemp > 0.0f || movZTemp > 0.0f) {
-				orbitalAtiv = true;
-				tempoOrbit = 0.0f;
-			} else {
-				tempoOrbit += Time.deltaTime;
-				if (tempoOrbit > CameraSettings.OrbitalThatFollows.timeToReset) {
-					tempoOrbit = CameraSettings.OrbitalThatFollows.timeToReset + 0.1f;
-				}
-			}
-			//
-			switch (CameraSettings.OrbitalThatFollows.ResetControlType) {
-			case SettingsCameraOrbitalThatFollows.ResetTimeType.Time:
-				if (tempoOrbit > CameraSettings.OrbitalThatFollows.timeToReset) {
-					orbitalAtiv = false;
-				}
-				break;
-			case SettingsCameraOrbitalThatFollows.ResetTimeType.Input:
-				if (Input.GetKeyDown(CameraSettings.OrbitalThatFollows.resetKey)) {
-					orbitalAtiv = false;
-				}
-				break;
-			}
-			//
-			if(orbitalAtiv == true){
-				tempFloat = CameraSettings.OrbitalThatFollows.minDistance;
-				if (!Physics.Linecast (transform.position, cameras [index]._camera.transform.position)) {
+			    } else if (Physics.Linecast (transform.position, cameras [index]._camera.transform.position, out tempHit)) {
+				    if (!CameraSettings.orbital.ignoreCollision) {
+					    distanceFromOrbitalCamera [index] = Vector3.Distance (transform.position, tempHit.point);
+					    tempFloat = Mathf.Clamp ((Vector3.Distance (transform.position, tempHit.point)), tempFloat * 0.5f, CameraSettings.orbital.maxDistance);
+				    }
+			    }
+			    if (CameraSettings.orbital.rotateWhenClick) {
+				    if (Input.GetKey (CameraSettings.orbital.keyToRotate)) {
+					    xOrbit [index] += Input.GetAxis (CameraSettings.inputMouseX) * (CameraSettings.orbital.sensibility * distanceFromOrbitalCamera [index]) / (distanceFromOrbitalCamera [index] * 0.5f);
+					    yOrbit [index] -= Input.GetAxis (CameraSettings.inputMouseY) * CameraSettings.orbital.sensibility * (CameraSettings.orbital.speedYAxis * 10.0f);
+				    }
+			    } else {
+				    xOrbit [index] += Input.GetAxis (CameraSettings.inputMouseX) * (CameraSettings.orbital.sensibility * distanceFromOrbitalCamera [index]) / (distanceFromOrbitalCamera [index] * 0.5f);
+				    yOrbit [index] -= Input.GetAxis (CameraSettings.inputMouseY) * CameraSettings.orbital.sensibility * (CameraSettings.orbital.speedYAxis * 10.0f);
+			    }
+			    yOrbit [index] = ClampAngle (yOrbit [index], CameraSettings.orbital.minAngleY, CameraSettings.orbital.maxAngleY);
+			    tempRotation2 = Quaternion.Euler (yOrbit [index], xOrbit [index], 0);
+			    distanceFromOrbitalCamera [index] = Mathf.Clamp (distanceFromOrbitalCamera [index] - Input.GetAxis (CameraSettings.inputMouseScrollWheel) * (CameraSettings.orbital.speedScrool * 50.0f), tempFloat, CameraSettings.orbital.maxDistance);
+			    negPosition = new Vector3 (0.0f, 0.0f, -distanceFromOrbitalCamera [index]);
+			    otherPosition = tempRotation2 * negPosition + transform.position;
+			    newPosition = cameras [index]._camera.transform.position;
+			    tempRotation = cameras [index]._camera.transform.rotation;
+			    cameras [index]._camera.transform.rotation = Quaternion.Lerp(tempRotation,tempRotation2,Time.deltaTime*5.0f*timeScaleSpeed);
+			    cameras [index]._camera.transform.position = Vector3.Lerp(newPosition,otherPosition,Time.deltaTime*5.0f*timeScaleSpeed);
+                break;
+		    case CameraType.TipoRotac.OrbitalThatFollows:
+			    if (CameraSettings.OrbitalThatFollows.rotateWhenClick) {
+				    if (Input.GetKey (CameraSettings.OrbitalThatFollows.keyToRotate)) {
+					    movXTemp = Input.GetAxis (CameraSettings.inputMouseX);
+					    movYTemp = Input.GetAxis (CameraSettings.inputMouseY);
+				    }
+			    } else {
+				    movXTemp = Input.GetAxis (CameraSettings.inputMouseX);
+				    movYTemp = Input.GetAxis (CameraSettings.inputMouseY);
+			    }
+			    movZTemp = Input.GetAxis (CameraSettings.inputMouseScrollWheel);
+			    if (movXTemp > 0.0f || movYTemp > 0.0f || movZTemp > 0.0f) {
+				    orbitalAtiv = true;
+				    tempoOrbit = 0.0f;
+			    } else {
+				    tempoOrbit += Time.deltaTime;
+				    if (tempoOrbit > CameraSettings.OrbitalThatFollows.timeToReset) {
+					    tempoOrbit = CameraSettings.OrbitalThatFollows.timeToReset + 0.1f;
+				    }
+			    }
+			    //
+			    switch (CameraSettings.OrbitalThatFollows.ResetControlType) {
+			    case SettingsCameraOrbitalThatFollows.ResetTimeType.Time:
+				    if (tempoOrbit > CameraSettings.OrbitalThatFollows.timeToReset) {
+					    orbitalAtiv = false;
+				    }
+				    break;
+			    case SettingsCameraOrbitalThatFollows.ResetTimeType.Input:
+				    if (Input.GetKeyDown(CameraSettings.OrbitalThatFollows.resetKey)) {
+					    orbitalAtiv = false;
+				    }
+				    break;
+			    }
+			    //
+			    if(orbitalAtiv == true){
+				    tempFloat = CameraSettings.OrbitalThatFollows.minDistance;
+				    if (!Physics.Linecast (transform.position, cameras [index]._camera.transform.position)) {
 
-				} else if (Physics.Linecast (transform.position, cameras [index]._camera.transform.position, out tempHit)) {
-					if (!CameraSettings.OrbitalThatFollows.ignoreCollision) {
-						distanceFromOrbitalCamera [index] = Vector3.Distance (transform.position, tempHit.point);
-						tempFloat = Mathf.Clamp ((Vector3.Distance (transform.position, tempHit.point)), tempFloat * 0.5f, CameraSettings.OrbitalThatFollows.maxDistance);
-					}
-				}
-				xOrbit [index] += movXTemp * (CameraSettings.OrbitalThatFollows.sensibility * distanceFromOrbitalCamera [index]) / (distanceFromOrbitalCamera [index] * 0.5f);
-				yOrbit [index] -= movYTemp * CameraSettings.OrbitalThatFollows.sensibility * (CameraSettings.OrbitalThatFollows.speedYAxis * 10.0f);
-				yOrbit [index] = ClampAngle (yOrbit [index], CameraSettings.OrbitalThatFollows.minAngleY, CameraSettings.OrbitalThatFollows.maxAngleY);
-				tempRotation2 = Quaternion.Euler (yOrbit [index], xOrbit [index], 0);
-				distanceFromOrbitalCamera [index] = Mathf.Clamp (distanceFromOrbitalCamera [index] - movZTemp * (CameraSettings.OrbitalThatFollows.speedScrool * 50.0f), tempFloat, CameraSettings.OrbitalThatFollows.maxDistance);
-				negPosition = new Vector3 (0.0f, 0.0f, -distanceFromOrbitalCamera [index]);
-				otherPosition = tempRotation2 * negPosition + transform.position;
-				newPosition = cameras [index]._camera.transform.position;
-				tempRotation = cameras [index]._camera.transform.rotation;
-				cameras [index]._camera.transform.rotation = Quaternion.Lerp (tempRotation, tempRotation2, Time.deltaTime * 5.0f * timeScaleSpeed);
-				cameras [index]._camera.transform.position = Vector3.Lerp (newPosition, otherPosition, Time.deltaTime * 5.0f * timeScaleSpeed);
-			} else {
-				if (!Physics.Linecast (transform.position, originalPosition [index].transform.position)) {
-					cameras [index]._camera.transform.position = Vector3.Lerp (cameras [index]._camera.transform.position, originalPosition [index].transform.position, Time.deltaTime * CameraSettings.OrbitalThatFollows.displacementSpeed);
-				}
-				else if(Physics.Linecast(transform.position, originalPosition [index].transform.position,out tempHit)){
-					if (CameraSettings.OrbitalThatFollows.ignoreCollision) {
-						cameras [index]._camera.transform.position = Vector3.Lerp (cameras [index]._camera.transform.position, originalPosition [index].transform.position, Time.deltaTime * CameraSettings.OrbitalThatFollows.displacementSpeed);
-					} 
-					else {
-						cameras [index]._camera.transform.position = Vector3.Lerp(cameras [index]._camera.transform.position, tempHit.point,Time.deltaTime * CameraSettings.OrbitalThatFollows.displacementSpeed);
-					}
-				}
-				//
-				if (CameraSettings.OrbitalThatFollows.customLookAt) {
-					tempRotation = Quaternion.LookRotation (transform.position - cameras [index]._camera.transform.position, Vector3.up);
-					cameras [index]._camera.transform.rotation = Quaternion.Slerp (cameras [index]._camera.transform.rotation, tempRotation, Time.deltaTime * CameraSettings.OrbitalThatFollows.spinSpeedCustomLookAt);
-				} else {
-					cameras [index]._camera.transform.LookAt (transform.position);
-				}
-			}
-			break;
-		case CameraType.TipoRotac.ETS_StyleCamera:
-			if (CameraSettings.ETS_StyleCamera.rotateWhenClick) {
-				if (Input.GetKey (CameraSettings.ETS_StyleCamera.keyToRotate)) {
-					rotacXETS += Input.GetAxis (CameraSettings.inputMouseX) * CameraSettings.ETS_StyleCamera.sensibilityX;
-					rotacYETS += Input.GetAxis (CameraSettings.inputMouseY) * CameraSettings.ETS_StyleCamera.sensibilityY;
-				}
-			} else {
-				rotacXETS += Input.GetAxis (CameraSettings.inputMouseX) * CameraSettings.ETS_StyleCamera.sensibilityX;
-				rotacYETS += Input.GetAxis (CameraSettings.inputMouseY) * CameraSettings.ETS_StyleCamera.sensibilityY;
-			}
-			newPosition = new Vector3 (originalPositionETS [index].x + Mathf.Clamp (rotacXETS / 50 + (CameraSettings.ETS_StyleCamera.ETS_CameraShift/3.0f), -CameraSettings.ETS_StyleCamera.ETS_CameraShift, 0), originalPositionETS [index].y, originalPositionETS [index].z);
-			cameras [index]._camera.transform.localPosition = Vector3.Lerp (cameras [index]._camera.transform.localPosition, newPosition, Time.deltaTime * 10.0f);
-			rotacXETS = ClampAngle (rotacXETS, -180, 80);
-			rotacYETS = ClampAngle (rotacYETS, -60, 60);
-			temp_xQuaternion = Quaternion.AngleAxis (rotacXETS, Vector3.up);
-			temp_yQuaternion = Quaternion.AngleAxis (rotacYETS, -Vector3.right);
-			tempRotation = originalRotation [index] * temp_xQuaternion * temp_yQuaternion;
-			cameras [index]._camera.transform.localRotation = Quaternion.Lerp (cameras [index]._camera.transform.localRotation, tempRotation, Time.deltaTime * 10.0f * timeScaleSpeed);
-			//fieldOfView
-			cameras [index]._camera.fieldOfView -= Input.GetAxis (CameraSettings.inputMouseScrollWheel)*CameraSettings.ETS_StyleCamera.speedScroolZoom*50.0f;
-			if (cameras [index]._camera.fieldOfView < (initialFieldOfView [index] - CameraSettings.ETS_StyleCamera.maxScroolZoom)) {
-				cameras [index]._camera.fieldOfView = (initialFieldOfView [index] - CameraSettings.ETS_StyleCamera.maxScroolZoom);
-			}
-			if (cameras [index]._camera.fieldOfView > initialFieldOfView [index]) {
-				cameras [index]._camera.fieldOfView = (initialFieldOfView [index]);
-			}
-			break;
+				    } else if (Physics.Linecast (transform.position, cameras [index]._camera.transform.position, out tempHit)) {
+					    if (!CameraSettings.OrbitalThatFollows.ignoreCollision) {
+						    distanceFromOrbitalCamera [index] = Vector3.Distance (transform.position, tempHit.point);
+						    tempFloat = Mathf.Clamp ((Vector3.Distance (transform.position, tempHit.point)), tempFloat * 0.5f, CameraSettings.OrbitalThatFollows.maxDistance);
+					    }
+				    }
+				    xOrbit [index] += movXTemp * (CameraSettings.OrbitalThatFollows.sensibility * distanceFromOrbitalCamera [index]) / (distanceFromOrbitalCamera [index] * 0.5f);
+				    yOrbit [index] -= movYTemp * CameraSettings.OrbitalThatFollows.sensibility * (CameraSettings.OrbitalThatFollows.speedYAxis * 10.0f);
+				    yOrbit [index] = ClampAngle (yOrbit [index], CameraSettings.OrbitalThatFollows.minAngleY, CameraSettings.OrbitalThatFollows.maxAngleY);
+				    tempRotation2 = Quaternion.Euler (yOrbit [index], xOrbit [index], 0);
+				    distanceFromOrbitalCamera [index] = Mathf.Clamp (distanceFromOrbitalCamera [index] - movZTemp * (CameraSettings.OrbitalThatFollows.speedScrool * 50.0f), tempFloat, CameraSettings.OrbitalThatFollows.maxDistance);
+				    negPosition = new Vector3 (0.0f, 0.0f, -distanceFromOrbitalCamera [index]);
+				    otherPosition = tempRotation2 * negPosition + transform.position;
+				    newPosition = cameras [index]._camera.transform.position;
+				    tempRotation = cameras [index]._camera.transform.rotation;
+				    cameras [index]._camera.transform.rotation = Quaternion.Lerp (tempRotation, tempRotation2, Time.deltaTime * 5.0f * timeScaleSpeed);
+				    cameras [index]._camera.transform.position = Vector3.Lerp (newPosition, otherPosition, Time.deltaTime * 5.0f * timeScaleSpeed);
+			    } else {
+				    if (!Physics.Linecast (transform.position, originalPosition [index].transform.position)) {
+					    cameras [index]._camera.transform.position = Vector3.Lerp (cameras [index]._camera.transform.position, originalPosition [index].transform.position, Time.deltaTime * CameraSettings.OrbitalThatFollows.displacementSpeed);
+				    }
+				    else if(Physics.Linecast(transform.position, originalPosition [index].transform.position,out tempHit)){
+					    if (CameraSettings.OrbitalThatFollows.ignoreCollision) {
+						    cameras [index]._camera.transform.position = Vector3.Lerp (cameras [index]._camera.transform.position, originalPosition [index].transform.position, Time.deltaTime * CameraSettings.OrbitalThatFollows.displacementSpeed);
+					    } 
+					    else {
+						    cameras [index]._camera.transform.position = Vector3.Lerp(cameras [index]._camera.transform.position, tempHit.point,Time.deltaTime * CameraSettings.OrbitalThatFollows.displacementSpeed);
+					    }
+				    }
+				    //
+				    if (CameraSettings.OrbitalThatFollows.customLookAt) {
+					    tempRotation = Quaternion.LookRotation (transform.position - cameras [index]._camera.transform.position, Vector3.up);
+					    cameras [index]._camera.transform.rotation = Quaternion.Slerp (cameras [index]._camera.transform.rotation, tempRotation, Time.deltaTime * CameraSettings.OrbitalThatFollows.spinSpeedCustomLookAt);
+				    } else {
+					    cameras [index]._camera.transform.LookAt (transform.position);
+				    }
+			    }
+			    break;
+		    case CameraType.TipoRotac.ETS_StyleCamera:
+			    if (CameraSettings.ETS_StyleCamera.rotateWhenClick) {
+				    if (Input.GetKey (CameraSettings.ETS_StyleCamera.keyToRotate)) {
+					    rotacXETS += Input.GetAxis (CameraSettings.inputMouseX) * CameraSettings.ETS_StyleCamera.sensibilityX;
+					    rotacYETS += Input.GetAxis (CameraSettings.inputMouseY) * CameraSettings.ETS_StyleCamera.sensibilityY;
+				    }
+			    } else {
+				    rotacXETS += Input.GetAxis (CameraSettings.inputMouseX) * CameraSettings.ETS_StyleCamera.sensibilityX;
+				    rotacYETS += Input.GetAxis (CameraSettings.inputMouseY) * CameraSettings.ETS_StyleCamera.sensibilityY;
+			    }
+			    newPosition = new Vector3 (originalPositionETS [index].x + Mathf.Clamp (rotacXETS / 50 + (CameraSettings.ETS_StyleCamera.ETS_CameraShift/3.0f), -CameraSettings.ETS_StyleCamera.ETS_CameraShift, 0), originalPositionETS [index].y, originalPositionETS [index].z);
+			    cameras [index]._camera.transform.localPosition = Vector3.Lerp (cameras [index]._camera.transform.localPosition, newPosition, Time.deltaTime * 10.0f);
+			    rotacXETS = ClampAngle (rotacXETS, -180, 80);
+			    rotacYETS = ClampAngle (rotacYETS, -60, 60);
+			    temp_xQuaternion = Quaternion.AngleAxis (rotacXETS, Vector3.up);
+			    temp_yQuaternion = Quaternion.AngleAxis (rotacYETS, -Vector3.right);
+			    tempRotation = originalRotation [index] * temp_xQuaternion * temp_yQuaternion;
+			    cameras [index]._camera.transform.localRotation = Quaternion.Lerp (cameras [index]._camera.transform.localRotation, tempRotation, Time.deltaTime * 10.0f * timeScaleSpeed);
+			    //fieldOfView
+			    cameras [index]._camera.fieldOfView -= Input.GetAxis (CameraSettings.inputMouseScrollWheel)*CameraSettings.ETS_StyleCamera.speedScroolZoom*50.0f;
+			    if (cameras [index]._camera.fieldOfView < (initialFieldOfView [index] - CameraSettings.ETS_StyleCamera.maxScroolZoom)) {
+				    cameras [index]._camera.fieldOfView = (initialFieldOfView [index] - CameraSettings.ETS_StyleCamera.maxScroolZoom);
+			    }
+			    if (cameras [index]._camera.fieldOfView > initialFieldOfView [index]) {
+				    cameras [index]._camera.fieldOfView = (initialFieldOfView [index]);
+			    }
+			    break;
+            default:
+                break;
 		}
 	}
 
