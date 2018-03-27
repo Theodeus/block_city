@@ -47,7 +47,6 @@ public class InputManager : MonoBehaviour {
             Vector3 tmpRotation = camFocus.eulerAngles;
             camFocus.eulerAngles = newRotation;
             Vector3 delta = (Input.mousePosition - lastMousePosition);
-            Debug.Log(delta);
             camFocus.Translate(-delta.x * panSensitivity, 0, -delta.y * panSensitivity);
             //compensate for camera angle by moving the focus back up to ground level
             camFocus.Translate(0, -camFocus.position.y, 0);
