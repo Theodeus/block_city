@@ -10,7 +10,6 @@ public class InputManager : MonoBehaviour {
 
     private System.Random rand;
     private Vector3 lastMousePosition;
-    private Vector3 lastFocusPosition;
     private Camera cam;
 
     void Start()
@@ -49,6 +48,5 @@ public class InputManager : MonoBehaviour {
             camFocus.eulerAngles = tmpRotation;
         }
         lastMousePosition = Input.mousePosition;
-        lastFocusPosition = camFocus.position;
     }
 }
