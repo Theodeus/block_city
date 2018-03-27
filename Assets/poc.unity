@@ -2330,9 +2330,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   prefabBuildings:
-  - {fileID: 4717968796997870, guid: 042df022628bf5441b3598ad9e53c0d2, type: 2}
-  - {fileID: 4423106195112390, guid: 4c1629675f4c7dc448d95ca5f276d7eb, type: 2}
-  - {fileID: 4738705776764636, guid: 4d071a79bc06ed845a43eb0a41d85b22, type: 2}
+  - {fileID: 4434341883506582, guid: 985411f50edaed84a89ceb2c00a3084e, type: 2}
+  - {fileID: 4403045559444282, guid: d8c7b724c3669a844a027d72a403cef8, type: 2}
+  - {fileID: 4805359684947198, guid: ebb88440aa687954bb54f25cc318b2e3, type: 2}
   camFocus: {fileID: 577678664}
   panSensitivity: 0.01
 --- !u!4 &1854872948

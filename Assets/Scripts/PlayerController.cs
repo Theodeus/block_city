@@ -57,5 +57,11 @@ public class PlayerController : MonoBehaviour {
             _propBlock.SetColor("_Color", newColor);
             _renderer.SetPropertyBlock(_propBlock);
         }
+
+        ParticleSystem parts = other.gameObject.GetComponentInChildren<ParticleSystem>();
+        if (parts)
+        {
+            parts.Play();
+        }
     }
 }
