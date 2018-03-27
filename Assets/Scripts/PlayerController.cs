@@ -63,5 +63,11 @@ public class PlayerController : MonoBehaviour {
         {
             parts.Play();
         }
+
+        AudioSource sound = other.gameObject.GetComponentInChildren<AudioSource>();
+        if (sound)
+        {
+            sound.Play();
+        }
     }
 }
